@@ -1,11 +1,12 @@
 import re
+import __builtin__
 import sys
 import ast
 import meta
 import string
 
 
-RESERVED_VARS = '__name__', '__file__'
+RESERVED_VARS = dir(__builtin__)
 
 
 def _varname_iterator():
