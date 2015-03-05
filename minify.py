@@ -3,14 +3,16 @@ import ast
 import meta
 
 
-steps = []  # [replace_variables, remove_whitespace]
+steps = [lambda x: x]
 
 
 def minify(filename):
     with open(filename) as f:
         code = f.read()
     result = ast.parse(code)
+    for step in steps:
+        result = step(result)
     return meta.dump_python_source(result)
 
 if __name__ == '__main__':
-    minify(sys.argv[1])
+    print minify(sys.argv[1])
