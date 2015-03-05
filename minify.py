@@ -1,7 +1,11 @@
+import re
 import sys
 import ast
 import meta
 import string
+
+
+RESERVED_VARS = '__name__', '__file__'
 
 
 def _varname_iterator():
@@ -17,7 +21,9 @@ vars = {}
 
 
 def map_var(name):
-    if name in vars:
+    if name in RESERVED_VARS:
+        return name
+    elif name in vars:
         return vars[name]
     else:
         vars[name] = varname_iterator.next()
@@ -41,11 +47,12 @@ steps = [replace_variables]
 def minify(filename):
     with open(filename) as f:
         code = f.read()
+
     result = ast.parse(code)
     for step in steps:
         result = step(result)
     codestr = meta.dump_python_source(result)
-    codestr = codestr.replace('el        if', 'elif')
+    codestr = re.sub('el\s+if ', 'elif ', codestr)
     return codestr
 
 
