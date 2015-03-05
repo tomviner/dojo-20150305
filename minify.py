@@ -1,14 +1,37 @@
 import sys
 import ast
 import meta
+import string
+
+
+def _varname_iterator():
+    var_incr = 0
+    while True:
+        for letter in string.ascii_letters:
+            yield letter + str(var_incr if var_incr > 0 else '')
+        var_incr += 1
+varname_iterator = _varname_iterator()
+
+
+vars = {}
+
+
+def map_var(name):
+    if name in vars:
+        return vars[name]
+    else:
+        vars[name] = varname_iterator.next()
+        return vars[name]
 
 
 def replace_variables(code):
     for node in ast.walk(code):
-        if hasattr(node, 'id'):
-            node.id = node.id[0]
+        if hasattr(node, 'asname'):
+            node.asname = map_var(node.name)
+        elif hasattr(node, 'id'):
+            node.id = map_var(node.id)
         elif hasattr(node, 'name'):
-            node.name = node.name[0]
+            node.name = map_var(node.name)
     return code
 
 
@@ -21,7 +44,10 @@ def minify(filename):
     result = ast.parse(code)
     for step in steps:
         result = step(result)
-    return meta.dump_python_source(result)
+    codestr = meta.dump_python_source(result)
+    codestr = codestr.replace('el        if', 'elif')
+    return codestr
+
 
 if __name__ == '__main__':
     filename = sys.argv[-1]
