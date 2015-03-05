@@ -1,1 +1,1 @@
-meta
+-e git+git@github.com:tomviner/Meta.git@feature-minfied-python-source#egg=meta-develop
