@@ -53,8 +53,6 @@ def minify(filename):
     for step in steps:
         result = step(result)
     codestr = meta.dump_python_source(result)
-    # When we rewrite the elif expr the meta package misses that it's an elif
-    # so we fix it up after the fact.
     codestr = re.sub('el\s+if ', 'elif ', codestr)
     return codestr
 
